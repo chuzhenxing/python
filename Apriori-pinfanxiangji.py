@@ -186,7 +186,6 @@ if __name__ == "__main__":
     resulty.to_csv('stockIBM2.csv', encoding='utf-8', index=True,header=True)
 
     '''
-# 查询一天行为页面的脚本
 
 select deviceid, name
 from

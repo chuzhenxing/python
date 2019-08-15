@@ -1,0 +1,75 @@
+# coding:utf-8
+import xlrd
+import pymysql
+import os
+
+
+# 函数1：把表导入python,数组格式
+def excel_table_byname(file='ribao.xlsx',colname_index=0,by_name=u'Sheet1'):
+    data = xlrd.open_workbook(file)  # 文件名，把文件与py文件放在同一目录下
+    table=data.sheet_by_name(by_name)
+    nrows=table.nrows#行数
+    colnames=table.row_values(colname_index)#某一行数据,0为获取报表名称行数据
+    res_list=[]
+    for rownum in range (1, nrows):
+        row = table.row_values (rownum)
+        res_list.append (row)
+        row = []
+    return res_list
+# 函数2：把表从python上传到mysql数据库
+def insert_db(data):
+    # 建立mysql连接
+    conn = pymysql.connect(host='XXX', port=XXXX, user='qd_user', passwd='qd_user_!@#', db='xianxia', charset='utf8mb4')
+    # 获得游标
+    cursor = conn.cursor()
+
+    if data[0][6] == u'直销'or data[0][6] is None:
+        query = "DELETE FROM ribao where acct_type_new = '%s' or acct_type_new is Null" % ('直销')
+        cursor.execute (query)
+        query = "INSERT INTO ribao (days,Whitelist,hy1,hy2,source,cash,acct_type_new) VALUES (%s, %s, %s, %s, %s, %s, %s)"  # 插入语句
+        cursor.executemany (query, data)
+    elif data[0][6] == u'渠道'or data[0][6] is None:
+        query = "DELETE FROM ribao where acct_type_new = '%s' or acct_type_new is Null" % ('渠道')
+        cursor.execute (query)
+        query = "INSERT INTO ribao (days,Whitelist,hy1,hy2,source,cash,acct_type_new) VALUES (%s, %s, %s, %s, %s, %s, %s)"  # 插入语句
+        cursor.executemany (query, data)
+    elif data[0][6] == u'KA'or data[0][6] is None:
+        query = "DELETE FROM ribao where acct_type_new = '%s' or acct_type_new is Null" % ('KA')
+        cursor.execute (query)
+        query = "INSERT INTO ribao (days,Whitelist,hy1,hy2,source,cash,acct_type_new) VALUES (%s, %s, %s, %s, %s, %s, %s)"  # 插入语句
+        cursor.executemany (query, data)
+    else:
+        pass
+
+    conn.commit()  # 提交
+    cursor.close()  # 关闭连接
+    conn.close()  # 关闭数据
+
+def main():
+    data = excel_table_byname()
+    insert_db(data)
+    os.system ("pause")
+
+if __name__ == "__main__":
+    main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+# https://blog.csdn.net/qq_42708830/article/details/92762302
+# https://blog.csdn.net/wangtingting_100/article/details/80082023
+# https://blog.csdn.net/Void_FR_LJ/article/details/82729163  pandas版本
+# https://www.cnblogs.com/robinunix/p/8426832.html  日报打包
+# https://www.cnblogs.com/xbblogs/p/9682708.html
+# https://jingyan.baidu.com/article/a378c960b47034b3282830bb.html
+# pyinstaller -F -w ribao.py
+

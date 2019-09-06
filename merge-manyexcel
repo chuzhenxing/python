@@ -1,0 +1,35 @@
+# -*- coding: utf-8 -*-
+import os
+import pandas as pd
+import numpy as np
+
+# dir = "D:\\python_ziyuan\\pycharm\\py2\\q_huwai_2017_2019\\zhongtian_2017_2019"#设置工作路径
+dir = "D:\\python_ziyuan\\pycharm\\py2\\q_network_2017_2019\\airui_2017_2019"#设置工作路径
+#新建列表，存放文件名（可以忽略，但是为了做的过程能心里有数，先放上）
+filename_excel = []
+#新建列表，存放每个文件数据框（每一个excel读取后存放在数据框）
+frames = []
+for root, dirs, files in os.walk(dir):
+    for file in files:
+        # print(os.path.join(root,file))
+        filename_excel.append(os.path.join(root,file))
+        df = pd.read_excel(os.path.join(root,file)) #excel转换成DataFrame
+        frames.append(df)
+#打印文件名
+print(filename_excel)
+#合并所有数据
+result = pd.concat(frames)
+# result.columns = [u'时间',u'客户品牌',u'客户名称',u'行业大类',u'行业小类',u'地域',u'媒体类型',u'价格（万元）',u'估算价格（万元）',u'媒体',u'广告形式']
+result.columns = [u'投放时间',u'大行业',u'中行业',u'小行业',u'城市',u'广告主',u'品牌',u'产品',u'活动',u'广告形式',u'媒体类别','媒体','媒体频道','投放天次（个）','预估费用（万元）']
+
+
+#查看合并后的数据
+print result.head()
+print result.shape
+# 保存合并的数据到电脑D盘的merge文件夹中，并把合并后的文件命名为a12.csv
+# result.to_csv('D:\\python_ziyuan\\pycharm\\py2\\q_huwai_2017_2019\\zhongtian_2017_2019\\a12.csv',sep=',',index = False, encoding='gbk')
+result.to_csv('D:\\python_ziyuan\\pycharm\\py2\\q_network_2017_2019\\airui_2017_2019\\a12.csv',sep=',',index = False, encoding='utf-8')
+print '完成'
+#
+# https://blog.csdn.net/shouji111111/article/details/86062328
+# https://www.cnblogs.com/gzlhuan/p/8011304.html

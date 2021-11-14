@@ -1,0 +1,52 @@
+# coding:utf-8
+import xlrd
+import pymysql
+import os
+import xlwt
+
+def xiazai_db(cursor,workbook,sql,sheet_ji):
+    cursor.execute(sql)
+    result = cursor.fetchall()
+    # print(result)
+
+    cursor.scroll(0,mode='absolute')
+    fields=cursor.description
+    # print(fields)
+
+    # 创建一个新的sheet
+    sheet=workbook.add_sheet(sheet_ji,cell_overwrite_ok=True)
+    # 将表的字段名写入Excel
+    for field in range(len(fields)):
+        sheet.write(0,field,fields[field][0])
+    # 结果写入Excel
+    for row in range(1,len(result)+1):
+        for col in range(len(fields)):
+            sheet.write(row,col,result[row-1][col])
+
+def main():
+    # 建立mysql连接
+    conn = pymysql.connect(host='xx.xxx.xx.xx', port=xxxx, user='admin', passwd='xxxxxx', db='vertical_sale', charset='utf8mb4')
+    # 获得游标
+    cursor = conn.cursor()
+    # 将查询结果写入到Excel,创建一个工作簿
+    workbook = xlwt.Workbook()
+
+    xiazai_db(cursor,workbook,sql = "select * FROM z_mid_order_total",sheet_ji='订单_total')
+    xiazai_db(cursor,workbook,sql = "select * FROM z_mid_apportion_acg_and_jmx",sheet_ji='分摊_acg')
+    xiazai_db(cursor,workbook,sql = "select * FROM z_mid_apportion_xyv",sheet_ji='分摊_xyv')
+
+    # Excel保存为文件
+    workbook.save(r'list.xls')
+
+    cursor.close()  # 关闭连接
+    conn.close()  # 关闭数据
+if __name__ == "__main__":
+    main()
+
+# https://blog.csdn.net/qiudechao1/article/details/88998173?spm=1001.2101.3001.6650.14&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7Edefault-14.no_search_link&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7Edefault-14.no_search_link
+# https://www.cnblogs.com/robinunix/p/8426832.html  日报打包
+# https://www.cnblogs.com/xbblogs/p/9682708.html
+# https://jingyan.baidu.com/article/a378c960b47034b3282830bb.html
+# pyinstaller -F -w ribao.py
+备注：本脚本的功能主要是通过python直接链接数据库运行SQL，然后批量把对应的多个明细依次输出到一个Excel工作簿的不同的sheet中，且导出。
+我们可以通过pyinstaller把该脚本打包成EXE文件，每次需要时直接运行下，就可以产出对应的Excel
